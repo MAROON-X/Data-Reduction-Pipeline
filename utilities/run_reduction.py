@@ -18,10 +18,10 @@ Steps, in order:
 8. ``barycor``        - barycentric correction of the reduced spectra
 9. ``export``         - merge BLUE + RED into the final science bundle
 
-Nothing is hard-coded to the tutorial dataset: the exposure times of step 2
+Nothing is hard-coded: the exposure times of step 2
 and the flat recipe of step 4 are read off the files actually present, and a
 step whose selection comes up empty is reported and skipped rather than
-raising. That keeps the script usable both on a handful of test files and on
+raising. That is intended to keep the script usable both on a handful of test files and on
 a full reduction.
 
 Examples

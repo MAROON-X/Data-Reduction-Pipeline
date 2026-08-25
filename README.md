@@ -93,6 +93,63 @@ installation is editable, so no reinstallation is needed.
 
 All three are at **https://maroonxdr.readthedocs.io/latest/**.
 
+## Automation Layer
+We provide an additional automation layer using `utilities/run_reduction.py` which wraps the entire data reduction process allowing you to reduce all your data at once or perform only specifc steps of the process.
+
+Steps, in order:
+
+1. ``debundle``       - split raw GOA bundles into per-arm FITS files
+2. ``darks``          - master dark per (exposure time, arm)
+3. ``darkcoeffs``     - dark scaling coefficients per arm
+4. ``flats``          - master flat per arm
+5. ``wavecal``        - dynamic etalon wavelength solution
+6. ``syntheticdarks`` - dark interpolated to each science exposure time
+7. ``science``        - full echelle extraction of the science frames
+8. ``barycor``        - barycentric correction of the reduced spectra
+9. ``export``         - merge BLUE + RED into the final science bundle
+
+Nothing is hard-coded: the exposure times of step 2
+and the flat recipe of step 4 are read off the files actually present, and a
+step whose selection comes up empty is reported and skipped rather than
+raising. That is intended to keep the script usable both on a handful of test files and on
+a full reduction.
+
+Examples
+--------
+See what is in a directory before reducing anything::
+
+    python utilities/run_reduction.py /data/mx_test --inventory
+
+Dry run of the whole chain - prints the selection, recipe and parameters of
+every step and runs nothing::
+
+    python utilities/run_reduction.py /data/mx_test --dry-run
+
+Reduce a small test set end to end, carrying on past failures::
+
+    python utilities/run_reduction.py /data/mx_test --keep-going
+
+Re-run the science step and everything after it::
+
+    python utilities/run_reduction.py /data/mx_test --steps science-
+
+Resume a long reduction, skipping steps whose products already exist::
+
+    python utilities/run_reduction.py /data/mx_test --resume
+
+Restrict the run to one arm, one night and one target::
+
+    python utilities/run_reduction.py /data/mx_test --arms BLUE \
+        --expr 'ut_date=="2025-07-17"' --target HD3651
+
+Override any primitive parameter, scoped to a step::
+
+    python utilities/run_reduction.py /data/mx_test --steps science \
+        --param science:combineFibers:max_clips=30
+
+An initialised calibration database is required; see the "Calibration
+Database Setup" section of the tutorial.
+
 ## License
 
 MAROONXDR is distributed under the BSD 3-Clause license, the same license
